@@ -11,21 +11,19 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         java: [ '8', '11', '17' ]
         distribution: [ 'corretto', 'temurin' ]
-      name: Java ${{ matrix.Java }} (${{ matrix.distribution }}) Test Build
-      steps:
-        - uses: actions/checkout@v3
-        - name: Set up Java version
-          uses: actions/setup-java@v3
-          with:
-            distribution: ${{ matrix.distribution }}
-            java-version: ${{ matrix.java }}
-            cache: maven
-        - name: Build and verify the package
-          run: mvn -B verify package --file pom.xml
+    name: Java ${{ matrix.Java }} (${{ matrix.distribution }}) Test Build
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Java version
+        uses: actions/setup-java@v3
+        with:
+          distribution: ${{ matrix.distribution }}
+          java-version: ${{ matrix.java }}
+          cache: maven
+      - name: Build and verify the package
+        run: mvn -B verify package --file pom.xml

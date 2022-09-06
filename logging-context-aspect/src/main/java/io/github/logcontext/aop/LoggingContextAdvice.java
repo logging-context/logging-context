@@ -1,0 +1,165 @@
+package io.github.logcontext.aop;
+
+import io.github.logcontext.LogContext;
+import io.github.logcontext.LogContext.Builder;
+import io.github.logcontext.LoggingContext;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
+
+/**
+ * The LoggingContextAdvice class provides an {@link Aspect} implementation that is invoked on
+ * classes, methods, and parameters annotated with the {@link LoggingContext} annotation.
+ *
+ * <p>The advice will push nested context first for classes, then methods. If any parameters have
+ * the {@link LoggingContext} annotation, the last value of the annotation will be put in the
+ * context with the value of the parameter.
+ *
+ * <p>Any {@link LoggingContext} without an associated value will use the name of the annotated
+ * element as the context.
+ *
+ * <p>Examples: <code><pre>
+ * @LoggingContext("NamedClassContext") // Nested NamedClassContext
+ * public class NamedContextClass {
+ *
+ *   @LoggingContext("NamedMethodContext") // Nested NamedMethodContext
+ *   public void namedContextMethod(
+ *     @LoggingContext("NamedParamContext") String namedContextParam, // Mapped NamedParamContext
+ *     @LoggingContext String defaultContextParam, // Mapped defaultContextParam
+ *   ) {}
+ * }
+ *
+ * @LoggingContext // Nested DefaultContextClass
+ * public class DefaultContextClass {
+ *
+ *   @LoggingContext // Nested defaultContextMethod
+ *   public void defaultContextMethod(
+ *     String noContextParam, // Not in mapped context
+ *   ) {}
+ *
+ *   public void noContextMethod( // Not in nested context
+ *     @LoggingContext String defaultContextParam, // Mapped defaultContextParam
+ *   ) {}
+ * }
+ *   </pre></code>
+ */
+@Aspect
+public class LoggingContextAdvice {
+
+  /**
+   * An AspectJ Pointcut that identifies methods within classes annotated with @{@link
+   * LoggingContext}.
+   */
+  @Pointcut("@within(io.github.logcontext.LoggingContext) && execution(* *(*))")
+  public void classLoggingContext() {}
+
+  /** An AspectJ Pointcut that identifies methods annotated with @{@link LoggingContext}. */
+  @Pointcut("@annotation(io.github.logcontext.LoggingContext)")
+  public void methodLoggingContext() {}
+
+  /**
+   * An AspectJ Pointcut that identifies methods containing arguments annotated with @{@link
+   * LoggingContext}.
+   */
+  @Pointcut("execution(* *(.., @io.github.logcontext.LoggingContext (*), ..))")
+  public void argumentLoggingContext() {}
+
+  /**
+   * Examines an advice {@link ProceedingJoinPoint}'s target class, method, and method parameters
+   * for elements with the {@link LoggingContext} annotation. Any matches will have their associated
+   * context value added to the current logging context. The logging context values will be removed
+   * after the method's invocation.
+   *
+   * @param joinPoint the join point around a method that includes a logging context.
+   * @return the return value from the invoked join point.
+   * @throws Throwable if the invoked method threw an exceptions.
+   */
+  @Around("classLoggingContext() || methodLoggingContext() || argumentLoggingContext()")
+  public Object includeLoggingContext(final ProceedingJoinPoint joinPoint) throws Throwable {
+    if (joinPoint.getSignature() instanceof MethodSignature) {
+      MethodSignature ms = (MethodSignature) joinPoint.getSignature();
+      final Class<?> clazz = joinPoint.getTarget().getClass();
+      final Method method = ms.getMethod();
+
+      final Builder contextBuilder = Builder.builder();
+
+      try (LogContext context =
+          addLoggingContext(
+                  method.getParameters(),
+                  joinPoint.getArgs(),
+                  addLoggingContext(method, addLoggingContext(clazz, contextBuilder)))
+              .get()) {
+
+        return joinPoint.proceed();
+      }
+    } else {
+      return joinPoint.proceed();
+    }
+  }
+
+  /**
+   * Adds the logging context associated with the provided class to the provided logging context
+   * builder's nested context.
+   *
+   * @param clazz the annotated class that may have logging context annotations.
+   * @param builder the {@link Builder} to which the logging contexts should be added.
+   */
+  private Builder addLoggingContext(final Class<?> clazz, final Builder builder) {
+    if (clazz.isAnnotationPresent(LoggingContext.class)) {
+      final LoggingContext loggingContext = clazz.getAnnotation(LoggingContext.class);
+      final String[] contexts = getContextsOrDefault(loggingContext.value(), clazz.getSimpleName());
+      return builder.andNested(contexts);
+    }
+
+    return builder;
+  }
+
+  /**
+   * Adds the logging context associated with the provided method to the provided logging context
+   * builder's nested context.
+   *
+   * @param method the method that may have logging context annotations.
+   * @param builder the {@link Builder} to which the logging contexts should be added.
+   */
+  private Builder addLoggingContext(final Method method, final Builder builder) {
+    if (method.isAnnotationPresent(LoggingContext.class)) {
+      final LoggingContext loggingContext = method.getAnnotation(LoggingContext.class);
+      final String[] contexts = getContextsOrDefault(loggingContext.value(), method.getName());
+      return builder.andNested(contexts);
+    }
+
+    return builder;
+  }
+
+  /**
+   * Adds the logging context associated with the provided parameters and their values to the
+   * provided context builder's mapped context.
+   *
+   * @param parameters the annotated elements that may have logging context annotations.
+   * @param values the values associated with the parameters.
+   * @param builder the {@link Builder} to which the logging contexts should be added.
+   */
+  private Builder addLoggingContext(
+      final Parameter[] parameters, final Object[] values, Builder builder) {
+    for (int i = 0; i < parameters.length; i++) {
+      if (parameters[i].isAnnotationPresent(LoggingContext.class)) {
+        final LoggingContext loggingContext = parameters[i].getAnnotation(LoggingContext.class);
+        final String[] loggingContextNames =
+            getContextsOrDefault(loggingContext.value(), parameters[i].getName());
+        builder =
+            builder.andMapped(
+                loggingContextNames[loggingContextNames.length - 1], String.valueOf(values[i]));
+      }
+    }
+
+    return builder;
+  }
+
+  private String[] getContextsOrDefault(final String[] contexts, final String defaultContext) {
+    return (contexts != null && contexts.length > 0) ? contexts : new String[] {defaultContext};
+  }
+}

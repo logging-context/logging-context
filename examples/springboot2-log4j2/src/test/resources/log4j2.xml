@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="debug" strict="true" name="XMLConfigTest">
+
+  <Filter type="ThresholdFilter" level="trace"/>
+
+  <Appenders>
+    <Appender type="Console" name="STDOUT">
+      <Layout type="PatternLayout" pattern="%m NDC %x MDC %X %n"/>
+    </Appender>
+    <Appender type="List" name="test">
+      <Layout type="PatternLayout" pattern="%m NDC %x MDC %X %n"/>
+    </Appender>
+  </Appenders>
+
+  <Loggers>
+    <Logger name="io.github.logcontext" level="info" additivity="false">
+      <AppenderRef ref="STDOUT"/>
+      <AppenderRef ref="test" />
+    </Logger>
+
+    <Root level="warn">
+      <AppenderRef ref="STDOUT"/>
+      <AppenderRef ref="test" />
+    </Root>
+  </Loggers>
+
+</Configuration>

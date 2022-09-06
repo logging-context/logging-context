@@ -1,0 +1,35 @@
+{
+	"folders": [		
+		{
+			"path": "./logging-context-api",
+			"name": "API"
+		},
+		{
+			"path": "./logging-context-aspect",
+			"name": "Aspect"
+		},
+		{
+    	"path": "./logging-context-log4j12",
+    	"name": "Log4J 1.2 Bindings"
+    },
+		{
+			"path": "./logging-context-log4j2",
+			"name": "Log4J2 Bindings"
+		},
+		{
+			"path": "./examples/springboot2-log4j2",
+			"name": "Log4J2 Example Application"
+		},
+		{
+    	"path": "./examples/springboot15-log4j12",
+    	"name": "Log4J 1.2 Example Application"
+    },
+		{
+			"path": ".",
+			"name": "Project Root"
+		}
+	],
+	"settings": {
+		"java.configuration.updateBuildConfiguration": "automatic"
+	}
+}

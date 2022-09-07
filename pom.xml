@@ -3,7 +3,7 @@
 
   <groupId>io.github.logging-context</groupId>
   <artifactId>logging-context</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
   <packaging>pom</packaging>
 
   <name>logging-context</name>
@@ -14,6 +14,7 @@
     <connection>scm:git:git://github.com/logging-context/logging-context.git</connection>
     <developerConnection>scm:git:git@github.com:logging-context/logging-context.git</developerConnection>
     <url>http://github.com/logging-context/logging-context/tree/master</url>
+    <tag>0.0.1</tag>
   </scm>
 
   <licenses>
@@ -142,27 +143,27 @@
       <dependency>
         <groupId>io.github.logging-context</groupId>
         <artifactId>logging-context-api</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.1</version>
       </dependency>
       <dependency>
         <groupId>io.github.logging-context</groupId>
         <artifactId>logging-context-log4j12</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.1</version>
       </dependency>
       <dependency>
         <groupId>io.github.logging-context</groupId>
         <artifactId>logging-context-log4j2</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.1</version>
       </dependency>
       <dependency>
         <groupId>io.github.logging-context</groupId>
         <artifactId>logging-context-aspect</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.1</version>
       </dependency>
       <dependency>
         <groupId>io.github.logging-context</groupId>
         <artifactId>logging-context-spring-aop</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.1</version>
       </dependency>
 
       <dependency>

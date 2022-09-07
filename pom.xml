@@ -12,7 +12,7 @@
 
   <scm>
     <connection>scm:git:git://github.com/logging-context/logging-context.git</connection>
-    <developerConnection>scm:git:ssh://github.com/logging-context/logging-context.git</developerConnection>
+    <developerConnection>scm:git:git@github.com:logging-context/logging-context.git</developerConnection>
     <url>http://github.com/logging-context/logging-context/tree/master</url>
   </scm>
 
@@ -360,37 +360,12 @@
       </plugin>
 
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>flatten-maven-plugin</artifactId>
-        <version>${maven.flatten.version}</version>
-        <configuration>
-        </configuration>
-        <executions>
-          <!-- enable flattening -->
-          <execution>
-            <id>flatten</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>flatten</goal>
-            </goals>
-          </execution>
-          <!-- ensure proper cleanup -->
-          <execution>
-            <id>flatten.clean</id>
-            <phase>clean</phase>
-            <goals>
-              <goal>clean</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
         <version>${maven.release.version}</version>
         <configuration>
           <autoVersionSubmodules>true</autoVersionSubmodules>
+          <tagNameFormat>${project.version}</tagNameFormat>
           <useReleaseProfile>false</useReleaseProfile>
           <releaseProfiles>release</releaseProfiles>
           <goals>deploy</goals>

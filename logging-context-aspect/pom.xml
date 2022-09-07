@@ -13,10 +13,11 @@
 
   <name>logging-context-aspect</name>
   <description>An @AspectJ aspect for updating the logging context.</description>
+  <url>http://github.com/logging-context/logging-context</url>
 
   <scm>
     <connection>scm:git:git://github.com/logging-context/logging-context.git</connection>
-    <developerConnection>scm:git:ssh://github.com/logging-context/logging-context.git</developerConnection>
+    <developerConnection>scm:git:git@github.com:logging-context/logging-context.git</developerConnection>
     <url>http://github.com/logging-context/logging-context/tree/master</url>
   </scm>
 

@@ -37,7 +37,6 @@
     <java.version>1.8</java.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <maven.compiler.release>8</maven.compiler.release>
 
     <aspectj.version>[1.8.9,)</aspectj.version>
     <log4j12.version>2.10.0</log4j12.version>
@@ -77,6 +76,16 @@
       <modules>
         <module>examples</module>
       </modules>
+    </profile>
+
+    <profile>
+      <id>JDK9+</id>
+      <activation>
+        <jdk>[9,)</jdk>
+      </activation>
+      <properties>
+        <maven.compiler.release>8</maven.compiler.release>
+      </properties>
     </profile>
 
     <profile>

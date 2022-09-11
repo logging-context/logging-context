@@ -274,6 +274,8 @@ class LoggingContextAdviceTest {
     final ProceedingJoinPoint joinPoint = mock(ProceedingJoinPoint.class);
     final MethodSignature signature = mock(MethodSignature.class);
 
+    when(signature.getName()).thenReturn(method.getName());
+    when(signature.getParameterTypes()).thenReturn(method.getParameterTypes());
     when(signature.getMethod()).thenReturn(method);
 
     when(joinPoint.getTarget()).thenReturn(target);

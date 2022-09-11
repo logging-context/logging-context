@@ -83,7 +83,7 @@ public class LoggingContextAdvice {
     if (joinPoint.getSignature() instanceof MethodSignature) {
       MethodSignature ms = (MethodSignature) joinPoint.getSignature();
       final Class<?> clazz = joinPoint.getTarget().getClass();
-      final Method method = ms.getMethod();
+      final Method method = clazz.getMethod(ms.getName(), ms.getParameterTypes());
 
       final Builder contextBuilder = Builder.builder();
 

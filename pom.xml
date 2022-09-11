@@ -1,11 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>io.github.logging-context</groupId>
   <artifactId>logging-context</artifactId>
-  <version>${revision}</version>
+  <version>0.0.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>logging-context</name>
@@ -14,8 +12,9 @@
 
   <scm>
     <connection>scm:git:git://github.com/logging-context/logging-context.git</connection>
-    <developerConnection>scm:git:ssh://github.com:logging-context/logging-context.git</developerConnection>
+    <developerConnection>scm:git:git@github.com:logging-context/logging-context.git</developerConnection>
     <url>http://github.com/logging-context/logging-context/tree/master</url>
+    <tag>HEAD</tag>
   </scm>
 
   <licenses>
@@ -35,14 +34,11 @@
   </developers>
 
   <properties>
-    <revision>0.0.1-SNAPSHOT</revision>
-
     <java.version>1.8</java.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven.compiler.release>8</maven.compiler.release>
 
-    <logging-context.version>${revision}</logging-context.version>
     <aspectj.version>[1.8.9,)</aspectj.version>
     <log4j12.version>2.10.0</log4j12.version>
     <log4j2.version>[2.17.1,3)</log4j2.version>
@@ -147,27 +143,27 @@
       <dependency>
         <groupId>io.github.logging-context</groupId>
         <artifactId>logging-context-api</artifactId>
-        <version>${logging-context.version}</version>
+        <version>0.0.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>io.github.logging-context</groupId>
         <artifactId>logging-context-log4j12</artifactId>
-        <version>${logging-context.version}</version>
+        <version>0.0.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>io.github.logging-context</groupId>
         <artifactId>logging-context-log4j2</artifactId>
-        <version>${logging-context.version}</version>
+        <version>0.0.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>io.github.logging-context</groupId>
         <artifactId>logging-context-aspect</artifactId>
-        <version>${logging-context.version}</version>
+        <version>0.0.2-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>io.github.logging-context</groupId>
         <artifactId>logging-context-spring-aop</artifactId>
-        <version>${logging-context.version}</version>
+        <version>0.0.2-SNAPSHOT</version>
       </dependency>
 
       <dependency>
@@ -262,12 +258,12 @@
                 <include>*.md</include>
                 <include>.gitignore</include>
               </includes>
-              <trimTrailingWhitespace/>
-              <endWithNewline/>
+              <trimTrailingWhitespace />
+              <endWithNewline />
             </format>
           </formats>
           <java>
-            <googleJavaFormat/>
+            <googleJavaFormat />
           </java>
         </configuration>
       </plugin>
@@ -365,37 +361,12 @@
       </plugin>
 
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>flatten-maven-plugin</artifactId>
-        <version>${maven.flatten.version}</version>
-        <configuration>
-        </configuration>
-        <executions>
-          <!-- enable flattening -->
-          <execution>
-            <id>flatten</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>flatten</goal>
-            </goals>
-          </execution>
-          <!-- ensure proper cleanup -->
-          <execution>
-            <id>flatten.clean</id>
-            <phase>clean</phase>
-            <goals>
-              <goal>clean</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
         <version>${maven.release.version}</version>
         <configuration>
           <autoVersionSubmodules>true</autoVersionSubmodules>
+          <tagNameFormat>${project.version}</tagNameFormat>
           <useReleaseProfile>false</useReleaseProfile>
           <releaseProfiles>release</releaseProfiles>
           <goals>deploy</goals>

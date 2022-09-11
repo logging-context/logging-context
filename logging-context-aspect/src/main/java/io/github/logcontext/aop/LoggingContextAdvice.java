@@ -22,30 +22,30 @@ import org.aspectj.lang.reflect.MethodSignature;
  * <p>Any {@link LoggingContext} without an associated value will use the name of the annotated
  * element as the context.
  *
- * <p>Examples: <code><pre>
- * @LoggingContext("NamedClassContext") // Nested NamedClassContext
+ * <p>Examples: <pre>
+ * &amp;LoggingContext("NamedClassContext") // Nested NamedClassContext
  * public class NamedContextClass {
  *
- *   @LoggingContext("NamedMethodContext") // Nested NamedMethodContext
+ *   &amp;LoggingContext("NamedMethodContext") // Nested NamedMethodContext
  *   public void namedContextMethod(
- *     @LoggingContext("NamedParamContext") String namedContextParam, // Mapped NamedParamContext
- *     @LoggingContext String defaultContextParam, // Mapped defaultContextParam
+ *     &amp;LoggingContext("NamedParamContext") String namedContextParam, // Mapped NamedParamContext
+ *     &amp;LoggingContext String defaultContextParam, // Mapped defaultContextParam
  *   ) {}
  * }
  *
- * @LoggingContext // Nested DefaultContextClass
+ * &amp;LoggingContext // Nested DefaultContextClass
  * public class DefaultContextClass {
  *
- *   @LoggingContext // Nested defaultContextMethod
+ *   &amp;LoggingContext // Nested defaultContextMethod
  *   public void defaultContextMethod(
  *     String noContextParam, // Not in mapped context
  *   ) {}
  *
  *   public void noContextMethod( // Not in nested context
- *     @LoggingContext String defaultContextParam, // Mapped defaultContextParam
+ *     &amp;LoggingContext String defaultContextParam, // Mapped defaultContextParam
  *   ) {}
  * }
- *   </pre></code>
+ *   </pre>
  */
 @Aspect
 public class LoggingContextAdvice {

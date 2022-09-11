@@ -26,4 +26,4 @@ jobs:
           java-version: ${{ matrix.java }}
           cache: maven
       - name: Build and verify the package
-        run: mvn -B verify package --file pom.xml
+        run: mvn -B verify package --file pom.xml -Pexamples

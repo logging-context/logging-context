@@ -116,7 +116,7 @@ try (LogContext ctx = LogContext.Builder.nestedContext("USER_LOOKUP").andMapped(
 logger.info("Outside of context scope");
 ```
 
-This approach can be utilized using just the Logging Context API (`logging-context-api`) and an appropriate logging framework implementation (`logging-context-log4j2` or `logging-context-slf4j`).
+This approach can be utilized using just the Logging Context API (`logging-context-api`) and an appropriate logging framework implementation (`logging-context-log4j2` or `logging-context-log4j12`).
 
 __MAVEN DEPENDENCIES FOR FLUENT API: LOG4J2__
 ```xml
@@ -167,13 +167,85 @@ class OrdersService {
 }
 ```
 
-When `@LoggingContext` is applied to classes or methods, calls within their scope will update the nested diagnostic context. When the annotation is applied to parameters, the parameter and its value will be added to the mapped diagnostic context. Once the scope of the call is complete, the contexts will both be updated to no longer include the values.
-
-To achieve this, the Logging Context API must be combined with an Aspect Oriented Programming (AOP) framework like AspectJ or Spring Boot AOP.
+When `@LoggingContext` is applied to classes or methods, calls within their scope will update the nested diagnostic context. When the annotation is applied to parameters, the parameter and its value will be added to the mapped diagnostic context. Once the scope of the call is complete, the contexts will both be updated to no longer include the values. For parameters, if the `@LoggingContext` is not supplied a value, the mapped context will be named after the parameter (if it is available).
 
    > NOTE: The use of an empty `@LoggingContext` on parameters will not generate proper parameter names unless the Java compiler option `-parameters` is passed.
    > Failure to compile with the parameter debugging will result in context names like `arg0`. If you see context values of that form, consider either 
    > enabling `-parameters` via your build system or explicitly providing parameter names.
+
+To achieve this, the Logging Context API must be combined with an Aspect Oriented Programming (AOP) framework like AspectJ or Spring AOP. Currently only Spring AOP is supported. 
+
+### Logging Context Annotations with Spring
+
+#### Spring Maven Dependencies
+
+Additional Maven dependencies are required to use the annotation-based contexts.
+
+__MAVEN DEPENDENCIES FOR CONTEXT ANNOTATIONS WITH SPRING: Log4J 2__
+```xml
+<dependency>
+  <groupId>io.github.logging-context</groupId>
+  <artifactId>logging-context-log4j2</artifactId>
+  <version>${logging-context.version}</version>
+</dependency>
+<dependency>
+  <groupId>io.github.logging-context</groupId>
+  <artifactId>logging-context-spring-aop</artifactId>
+  <version>${logging-context.version}</version>
+</dependency>
+```
+
+__MAVEN DEPENDENCIES FOR CONTEXT ANNOTATIONS WITH SPRING: Log4J 1.2__
+```xml
+<dependency>
+  <groupId>io.github.logging-context</groupId>
+  <artifactId>logging-context-log4j12</artifactId>
+   <version>${logging-context.version}</version> 
+</dependency>
+<dependency>
+  <groupId>io.github.logging-context</groupId>
+  <artifactId>logging-context-spring-aop</artifactId>
+  <version>${logging-context.version}</version>
+</dependency>
+```
+
+These dependencies will additionally require the Spring AOP library and the appropriate version of Log4J.
+
+#### Configuring Spring
+
+The `logging-context-spring-aop` package includes a Spring `@Configuration` class `com.github.logcontext.spring.SpringAopLoggingContextConfiguration` that can be imported into your Spring application configuration to enable the annotations.
+
+```java
+import io.github.logcontext.spring.SpringAopLoggingContextConfiguration;
+import org.springframework.context.annotation.Import;
+
+@SpringBootApplication
+@Import(value = SpringAopLoggingContextConfiguration.class)
+public class MySpringBootApplicationWithLoggingContext {
+  ...
+}
+```
+### Configuring Logging to Include Contexts
+
+#### Log4J PatternLayout
+
+If you are using either Log4J 1.2 or Log4J 2 with the PatternLayout, the nested diagnostic context (NDC) is inserted via the `%x` variable and mapped diagnostic context (MDC) is inserted via `%X`.
+
+__LOG4J 1.2 log4j.properties__
+```properties
+appender.console.type = Console
+appender.console.name = STDOUT
+appender.console.layout.type = PatternLayout
+appender.console.layout.pattern = %d [%p] [%t] %c{1} [%x] %X - %m%n
+```
+
+__LOG4J 2 log4j2.xml__
+```xml
+<Appender type="Console" name="STDOUT">
+  <Layout type="PatternLayout" pattern="%d [%p] [%t] %c{1} [%x] %X - %m%n"/>
+</Appender>
+```
+
     
 # License
 

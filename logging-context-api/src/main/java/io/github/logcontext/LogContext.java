@@ -23,8 +23,20 @@ public interface LogContext extends AutoCloseable {
    */
   static LogContext closeableLogContext(final AutoCloseable closeable) {
     requireNonNull(closeable, "closeable must not be null");
-    return () -> closeable.close();
+    return () -> {
+      try {
+        closeable.close();
+      } catch (Exception e) {
+        // Suppress autoclosed exceptions
+      }
+    };
   }
+
+  /**
+   * Closes the log context. Log context closure should not result in an {@link Exception}.
+   */
+  @Override
+  void close();
 
   /**
    * The {@link Builder} class provides a utility for constructing additional logging context

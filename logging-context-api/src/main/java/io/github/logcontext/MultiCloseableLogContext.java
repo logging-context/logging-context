@@ -9,8 +9,8 @@ import java.util.List;
 /**
  * The MultiCloseableLogContext class provides a {@link LogContext} that will close a group of
  * {@link AutoCloseable} instances as a single close operation. The {@link AutoCloseable#close()}
- * method willed be called on every non-null instance provided. If any exceptions are thrown, the
- * last exception will be thrown after all contexts in the group have been closed.
+ * method willed be called on every non-null instance provided. Any exceptions thrown will be
+ * suppressed.
  */
 public class MultiCloseableLogContext implements LogContext {
 
@@ -29,20 +29,15 @@ public class MultiCloseableLogContext implements LogContext {
   }
 
   @Override
-  public void close() throws Exception {
-    Exception caught = null;
+  public void close() {
     for (AutoCloseable closeable : closeables) {
       try {
         if (!isNull(closeable)) {
           closeable.close();
         }
       } catch (final Exception e) {
-        caught = e;
+        // Suppress autocloseable exceptions
       }
-    }
-
-    if (!isNull(caught)) {
-      throw caught;
     }
   }
 }

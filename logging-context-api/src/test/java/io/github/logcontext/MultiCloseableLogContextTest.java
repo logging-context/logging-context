@@ -69,7 +69,7 @@ class MultiCloseableLogContextTest {
 
   /**
    * Test method for {@link MultiCloseableLogContext#close()} that ensures if any exceptions are
-   * thrown that all of the closeables are closed and the last exception is thrown.
+   * thrown that all closeables are closed and the exceptions are suppressed.
    */
   @Test
   void testClose_thrownExceptions() throws Exception {
@@ -82,7 +82,7 @@ class MultiCloseableLogContextTest {
     Mockito.doThrow(exception1).when(closeable1).close();
     Mockito.doThrow(exception2).when(closeable3).close();
 
-    assertThrows(Exception.class, () -> multiCloseableLogContext.close());
+    multiCloseableLogContext.close();
 
     verify(closeable1).close();
     verify(closeable2).close();

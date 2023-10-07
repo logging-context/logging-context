@@ -3,14 +3,19 @@ package io.github.logcontext;
 import static io.github.logcontext.LogContext.Builder.NO_OP_BUILDER;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
+import static java.util.stream.Collectors.toMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.github.logcontext.LogContext.Builder;
+import io.github.logcontext.fixtures.Person;
+import io.github.logcontext.fixtures.PersonContext;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -95,6 +100,59 @@ public class LogContextBuilderTest {
             .entrySet().iterator().next());
   }
 
+  /** Test method for {@link LogContext.Builder#mappedContext(Map)}. */
+  @Test
+  void testMappedContext_mappedValues() {
+    final Map<String, String> contexts = new LinkedHashMap<>();
+    contexts.put(TestValues.MAPPED_CONTEXT_1, TestValues.MAPPED_CONTEXT_VALUE_1);
+    contexts.put(TestValues.MAPPED_CONTEXT_2, TestValues.MAPPED_CONTEXT_VALUE_2);
+
+    final Builder logContextBuilder = Builder.mappedContext(contexts);
+
+    assertTestLogContextBuilder(logContextBuilder);
+
+    final TestableLogContext testableContext = assertTestableLogContext(logContextBuilder);
+    assertLogContextContainsMappings(testableContext,
+        singletonMap(TestValues.MAPPED_CONTEXT_1, TestValues.MAPPED_CONTEXT_VALUE_1)
+            .entrySet().iterator().next());
+    assertLogContextContainsMappings(testableContext,
+        singletonMap(TestValues.MAPPED_CONTEXT_2, TestValues.MAPPED_CONTEXT_VALUE_2)
+            .entrySet().iterator().next());
+  }
+
+  /** Test method for {@link LogContext.Builder#mappedContext(Object, ContextExtractor)}. */
+  @Test
+  void testMappedContext_extractedValues() {
+    final Builder logContextBuilder = Builder.mappedContext(PersonContext.PERSON, Person::toContext);
+
+    assertTestLogContextBuilder(logContextBuilder);
+
+    final TestableLogContext testableContext = assertTestableLogContext(logContextBuilder);
+    assertLogContextContainsMappings(testableContext, PersonContext.PERSON_CONTEXT_NAME);
+    assertLogContextContainsMappings(testableContext, PersonContext.PERSON_CONTEXT_BIRTHDATE);
+  }
+
+  /** Test method for {@link LogContext.Builder#mappedContext(Object, ContextExtractor)}. */
+  @Test
+  void testMappedContext_extractedValues_nullValue() {
+    final Builder logContextBuilder = Builder.mappedContext(null, Person::toContext);
+
+    assertTestLogContextBuilder(logContextBuilder);
+
+    final TestableLogContext testableContext = assertTestableLogContext(logContextBuilder);
+    assertTrue(testableContext.isEmpty());
+  }
+
+  /** Test method for {@link LogContext.Builder#mappedContext(Object, ContextExtractor)}. */
+  @Test
+  void testMappedContext_extractedValues_nullExtractor() {
+    final Builder logContextBuilder = Builder.mappedContext(PersonContext.PERSON, null);
+
+    assertTestLogContextBuilder(logContextBuilder);
+    final TestableLogContext testableContext = assertTestableLogContext(logContextBuilder);
+    assertTrue(testableContext.isEmpty());
+  }
+
   /**
    * Test for the {@link Builder#NO_OP_BUILDER} no-op implementation.
    *
@@ -102,7 +160,9 @@ public class LogContextBuilderTest {
    */
   @Test
   void testNoOpBuilder() throws Exception {
-    assertThat(NO_OP_BUILDER.andMapped(null, null), equalTo(NO_OP_BUILDER));
+    assertThat(NO_OP_BUILDER.andMapped((String) null, (String) null), equalTo(NO_OP_BUILDER));
+    assertThat(NO_OP_BUILDER.andMapped(null), equalTo(NO_OP_BUILDER));
+    assertThat(NO_OP_BUILDER.andMapped((Object) null, (ContextExtractor) null), equalTo(NO_OP_BUILDER));
     assertThat(NO_OP_BUILDER.andNested(null, null), equalTo(NO_OP_BUILDER));
     final LogContext noOpLogContext = NO_OP_BUILDER.get();
 
@@ -165,5 +225,7 @@ public class LogContextBuilderTest {
     public static final String MAPPED_CONTEXT_VALUE_2 = "Value2";
 
     public static final String MAPPED_CONTEXT_VALUE_3 = "Value3";
+
   }
+
 }

@@ -1,7 +1,11 @@
 package io.github.logcontext;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.anEmptyMap;
@@ -87,6 +91,21 @@ class AbstractLogContextBuilderTest {
         assertThat(logContextBuilder.getMappedContextValues(), hasEntry(CONTEXT_2, VALUE_2));
     }
 
+    /** Test method for {@link AbstractLogContextBuilder#andMapped(Map)}. */
+    @Test
+    void testAndMapped_providedMappings() {
+        final Map<String, String> contextMap = new HashMap<String, String>() {{
+            put(CONTEXT_1, VALUE_1);
+            put(CONTEXT_2, VALUE_2);
+        }};
+
+        LogContext.Builder builder = logContextBuilder.andMapped(contextMap);
+
+        assertThat(builder, sameInstance(logContextBuilder));
+        assertThat(logContextBuilder.getMappedContextValues(), hasEntry(CONTEXT_1, VALUE_1));
+        assertThat(logContextBuilder.getMappedContextValues(), hasEntry(CONTEXT_2, VALUE_2));
+    }
+
     /**
      * Test method for {@link AbstractLogContextBuilder#andMapped(String, String)} that ensures if a
      * newer value is provided for the same mapped context the older value is replaced.
@@ -105,6 +124,26 @@ class AbstractLogContextBuilderTest {
                 "logging context not replaced with newer value",
                 logContextBuilder.getMappedContextValues(),
                 hasEntry(CONTEXT_1, VALUE_2));
+    }
+
+    /**
+     * Test method for {@link AbstractLogContextBuilder#andMapped(Map)} that ensures if the provided
+     * mappings include a newer value for the same mapped context the older value is replaced.
+     */
+    @Test
+    void testAndMapped_providedMappings_overwriteExistingContextValue() {
+        LogContext.Builder builder = logContextBuilder.andMapped(CONTEXT_1, VALUE_1);
+
+        assertThat(builder, sameInstance(logContextBuilder));
+        assertThat(logContextBuilder.getMappedContextValues(), hasEntry(CONTEXT_1, VALUE_1));
+
+        builder = logContextBuilder.andMapped(singletonMap(CONTEXT_1, VALUE_2));
+
+        assertThat(builder, sameInstance(logContextBuilder));
+        assertThat(
+            "logging context not replaced with newer value from provided context mapping",
+            logContextBuilder.getMappedContextValues(),
+            hasEntry(CONTEXT_1, VALUE_2));
     }
 
     /**

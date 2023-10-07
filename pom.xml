@@ -156,6 +156,13 @@
       </dependency>
       <dependency>
         <groupId>io.github.logging-context</groupId>
+        <artifactId>logging-context-api</artifactId>
+        <version>0.0.3-SNAPSHOT</version>
+        <type>test-jar</type>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.github.logging-context</groupId>
         <artifactId>logging-context-log4j12</artifactId>
         <version>0.0.3-SNAPSHOT</version>
       </dependency>

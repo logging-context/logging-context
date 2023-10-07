@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -13,6 +14,7 @@ import static org.mockito.Mockito.when;
 import io.github.logcontext.LogContext;
 import io.github.logcontext.LogContext.Builder;
 import io.github.logcontext.LoggingContext;
+import io.github.logcontext.fixtures.PersonContext;
 import java.lang.reflect.Method;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -85,6 +87,56 @@ class LoggingContextAdviceTest {
               orderedCalls
                   .verify(mockBuilder)
                   .andMapped(ClassWithNamedAnnotation.PARAMETER_1_NAMED_LOGGING_CONTEXT, "value1");
+              orderedCalls.verify(mockBuilder).get();
+            });
+  }
+
+  /**
+   * Test method for {@link LoggingContextAdvice#includeLoggingContext(ProceedingJoinPoint)} that
+   * ensures that a class with a named logging context, method without a logging context, and
+   * parameter with an extracted context builds the appropriate logging context and closes it afterwards.
+   *
+   * @throws Throwable
+   */
+  @Test
+  void testIncludeLoggingContext_namedClassNoMethodExtractedParam() throws Throwable {
+    withMockJoinPoint(ClassWithNamedAnnotation.class, "methodA0_P1E_RV", null, PersonContext.PERSON)
+        .accept(
+            (orderedCalls, mockBuilder) -> {
+              orderedCalls
+                  .verify(mockBuilder)
+                  .andNested(ClassWithNamedAnnotation.LOGGING_CONTEXT_NAME);
+              orderedCalls
+                  .verify(mockBuilder)
+                  .andMapped(PersonContext.PERSON_CONTEXT);
+              orderedCalls.verify(mockBuilder).get();
+            });
+  }
+
+  /**
+   * Test method for {@link LoggingContextAdvice#includeLoggingContext(ProceedingJoinPoint)} that
+   * ensures that a class with a named logging context, method without a logging context, and
+   * parameter with an extracted context with a prefix mixed with a standard named context builds
+   * the appropriate logging context and closes it afterwards.
+   *
+   * @throws Throwable
+   */
+  @Test
+  void testIncludeLoggingContext_namedClass_noMethod_prefixedExtractedParamAndNamed() throws Throwable {
+    withMockJoinPoint(ClassWithNamedAnnotation.class, "methodA0_P1EP_P2N_RV", null, PersonContext.PERSON, PARAMETER_2_VALUE_INT)
+        .accept(
+            (orderedCalls, mockBuilder) -> {
+              orderedCalls
+                  .verify(mockBuilder)
+                  .andNested(ClassWithNamedAnnotation.LOGGING_CONTEXT_NAME);
+              orderedCalls
+                  .verify(mockBuilder)
+                  .andMapped(PersonContext.PERSON_CONTEXT_PREFIXED);
+              orderedCalls
+                  .verify(mockBuilder)
+                  .andMapped(
+                      ClassWithNamedAnnotation.PARAMETER_2_NAMED_LOGGING_CONTEXT,
+                      String.valueOf(PARAMETER_2_VALUE_INT));
               orderedCalls.verify(mockBuilder).get();
             });
   }
@@ -173,6 +225,8 @@ class LoggingContextAdviceTest {
               orderedCalls.verify(mockBuilder).get();
             });
   }
+
+
 
   /**
    * Test method for {@link LoggingContextAdvice#includeLoggingContext(ProceedingJoinPoint)} that
@@ -295,6 +349,7 @@ class LoggingContextAdviceTest {
     final LogContext mockContext = mock(LogContext.class);
     final Builder mockBuilder = mock(Builder.class);
     when(mockBuilder.andMapped(anyString(), anyString())).thenReturn(mockBuilder);
+    when(mockBuilder.andMapped(anyMap())).thenReturn(mockBuilder);
     when(mockBuilder.andNested(any())).thenReturn(mockBuilder);
     when(mockBuilder.get()).thenReturn(mockContext);
 

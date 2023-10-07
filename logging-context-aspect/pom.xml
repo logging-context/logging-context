@@ -52,6 +52,12 @@
     </dependency>
 
     <dependency>
+      <groupId>io.github.logging-context</groupId>
+      <artifactId>logging-context-api</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
       <scope>test</scope>

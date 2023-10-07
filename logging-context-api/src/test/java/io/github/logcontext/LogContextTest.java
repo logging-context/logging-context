@@ -27,6 +27,25 @@ class LogContextTest {
   }
 
   /**
+   * Test method for {@link LogContext#closeableLogContext(AutoCloseable)} that ensures any thrown
+   * exceptions from the provided {@link AutoCloseable} are swallowed and not propagated.
+   * */
+  @Test
+  void testCloseableLogContext_swallowsExceptions() throws Exception {
+    final AutoCloseable failingCloseable = () -> {
+      throw new RuntimeException("Fail");
+    };
+
+    final LogContext logContext = LogContext.closeableLogContext(failingCloseable);
+
+    assertThat(logContext, notNullValue());
+
+    logContext.close();
+
+    assertDoesNotThrow(logContext::close);
+  }
+
+  /**
    * Test method for {@link LogContext#closeableLogContext(AutoCloseable)} that ensures a {@link
    * NullPointerException} is thrown for a <code>null</code> closeable.
    */

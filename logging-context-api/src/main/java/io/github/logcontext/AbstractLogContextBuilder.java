@@ -1,5 +1,6 @@
 package io.github.logcontext;
 
+import io.github.logcontext.LogContext.Builder;
 import java.util.*;
 
 import static java.util.Collections.unmodifiableList;
@@ -59,6 +60,15 @@ public abstract class AbstractLogContextBuilder implements LogContext.Builder {
     public LogContext.Builder andMapped(final String context, final String value) {
         if (nonNull(context) && !context.trim().isEmpty()) {
             this.mappedContextValues.put(context, value);
+        }
+
+        return this;
+    }
+
+    @Override
+    public Builder andMapped(final Map<String, String> contexts) {
+        if (nonNull(contexts)) {
+            this.mappedContextValues.putAll(contexts);
         }
 
         return this;

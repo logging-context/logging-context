@@ -1,8 +1,11 @@
 package io.github.logcontext;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
 import java.io.Closeable;
+import java.util.Map;
+import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.function.Supplier;
 import java.util.stream.StreamSupport;
@@ -90,6 +93,30 @@ public interface LogContext extends AutoCloseable {
     }
 
     /**
+     * Creates a new {@link Builder} that will include the provided mapped context values.
+     *
+     * @param contexts a mapping of mapped diagnostic context (MDC) keys to their associated values.
+     * 
+     * @return a reference to the {@link Builder} for chaining.
+     */
+    static Builder mappedContext(final Map<String, String> contexts) {
+      return builder().andMapped(contexts);
+    }
+
+    /**
+     * Creates a new {@link Builder} that will include a mapped context extracted from the provided
+     * value.
+     *
+     * @param value the value from which mapped context values should be extracted.
+     * @param extractor the extractor function used to map the context from the provided value.
+     *
+     * @return a reference to the {@link Builder} for chaining.
+     */
+    static <T> Builder mappedContext(final T value, final ContextExtractor<T> extractor) {
+      return builder().andMapped(value, extractor);
+    }
+
+    /**
      * Adds additional Nested Diagnostic Context (NDC) information to the logging context.
      *
      * @param context the NDC values to add to the logging context.
@@ -105,6 +132,32 @@ public interface LogContext extends AutoCloseable {
      * @return a reference to the {@link Builder} for chaining.
      */
     Builder andMapped(final String context, final String value);
+
+    /**
+     * Adds additional Mapped Diagnostic Context (MDC) values to the logging context.
+     *
+     * @param contexts a mapping of mapped diagnostic context (MDC) keys to their associated values.
+     *
+     * @return a reference to the {@link Builder} for chaining.
+     */
+    Builder andMapped(final Map<String, String> contexts);
+
+    /**
+     * Adds additional Mapped Diagnostic Context (MDC) values to the logging context based on
+     * a context mapping extracted from the provided value.
+     *
+     * @param value the value from which mapped context values should be extracted.
+     * @param extractor the extractor function used to map the context from the provided value.
+     *
+     * @return a reference to the {@link Builder} for chaining.
+     */
+    default <T> Builder andMapped(final T value, final ContextExtractor<T> extractor) {
+      if (nonNull(value) && nonNull(extractor)) {
+        return andMapped(extractor.apply(value));
+      }
+
+      return this;
+    }
 
     /**
      * Updates the Nested Diagnostic Context and Mapped Diagnostic Contexts with the configured
@@ -132,6 +185,11 @@ public interface LogContext extends AutoCloseable {
 
           @Override
           public Builder andMapped(String context, String value) {
+            return this;
+          }
+
+          @Override
+          public Builder andMapped(Map<String, String> contexts) {
             return this;
           }
 

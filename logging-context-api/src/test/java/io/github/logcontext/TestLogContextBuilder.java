@@ -37,6 +37,13 @@ public class TestLogContextBuilder implements Builder {
   }
 
   @Override
+  public Builder andMapped(Map<String, String> contexts) {
+    requireNonNull(contexts, "contexts must not be null");
+    mappedContexts.putAll(contexts);
+    return this;
+  }
+
+  @Override
   public LogContext get() {
     return new TestableLogContext(nestedContexts, mappedContexts);
   }

@@ -2,7 +2,11 @@ package io.github.logcontext.aop;
 
 import static io.github.logcontext.aop.ClassWithNamedAnnotation.LOGGING_CONTEXT_NAME;
 
+import io.github.logcontext.ExtractedContext;
 import io.github.logcontext.LoggingContext;
+import io.github.logcontext.fixtures.Person;
+import io.github.logcontext.fixtures.PersonContext;
+import io.github.logcontext.fixtures.PersonContextExtractor;
 
 @LoggingContext(LOGGING_CONTEXT_NAME)
 public class ClassWithNamedAnnotation {
@@ -164,4 +168,12 @@ public class ClassWithNamedAnnotation {
   public void methodA2N_P1D_P2N_RV(
       @LoggingContext final String param1,
       @LoggingContext(PARAMETER_2_NAMED_LOGGING_CONTEXT) final int param2) {}
+
+
+  public void methodA0_P1E_RV(
+      @ExtractedContext(extractor = PersonContextExtractor.class) final Person person) {}
+
+  public void methodA0_P1EP_P2N_RV(
+      @ExtractedContext(prefix = PersonContext.PERSON_CONTEXT_PREFIX, extractor = PersonContextExtractor.class) final Person person,
+      @LoggingContext(PARAMETER_2_NAMED_LOGGING_CONTEXT) final Integer param2) {}
 }

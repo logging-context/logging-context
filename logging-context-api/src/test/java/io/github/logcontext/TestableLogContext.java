@@ -36,6 +36,10 @@ public class TestableLogContext implements LogContext {
     return this.closed;
   }
 
+  public boolean isEmpty() {
+    return mappedContexts.isEmpty() && nestedContexts.isEmpty();
+  }
+
   @Override
   public void close() {
     if (this.closed) {
